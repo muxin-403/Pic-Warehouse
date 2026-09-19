@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+.upload-card-flip {
+  perspective: 1200px;
+}
+
+.upload-card-flip-inner {
+  position: relative;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.upload-card-flip.is-flipped .upload-card-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.upload-card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.upload-card-face--back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+@media (max-width: 639px) {
+  .upload-card-flip.is-flipped {
+    perspective: none;
+  }
+
+  .upload-card-flip.is-flipped .upload-card-flip-inner {
+    transform: none;
+  }
+
+  .upload-card-flip .upload-card-face--back {
+    display: none;
+  }
+
+  .upload-card-flip.is-flipped .upload-card-face--front {
+    display: none;
+  }
+
+  .upload-card-flip.is-flipped .upload-card-face--back {
+    display: block;
+    position: static;
+    transform: none;
+  }
+
+  .upload-card-flip.is-flipped .upload-card-surface {
+    min-height: 0;
+  }
+}
+
+.upload-card-surface {
+  min-height: 20.5rem;
+  border-radius: 1rem;
+  border-width: 2px;
+  border-style: dashed;
+  background-color: color-mix(in oklab, var(--ui-bg-elevated) 72%, transparent);
+  padding: 2.5rem;
+  transition:
+    border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upload-card-surface:not(.upload-card-surface--panel) {
+  border-color: var(--ui-border);
+}
+
+.upload-card-surface:not(.upload-card-surface--panel):hover,
+.upload-card-surface:not(.upload-card-surface--panel).upload-card-surface--active {
+  border-color: var(--ui-primary);
+  background-color: color-mix(in oklab, var(--ui-primary) 10%, var(--ui-bg-elevated) 72%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--ui-primary) 25%, transparent),
+    0 8px 24px color-mix(in oklab, var(--ui-primary) 18%, transparent);
+}
+
+.upload-card-surface--panel {
+  border-style: solid;
+  border-color: var(--ui-border);
+  background-color: var(--ui-bg-elevated);
+  background-image: none;
+  box-shadow: var(--ui-shadow-sm);
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .upload-card-surface {
+    min-height: 22rem;
+    padding: 3rem;
+  }
+
+  .upload-card-surface--panel {
+    padding: 0;
+  }
+}
+
+.upload-settings-btn .upload-settings-icon {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upload-settings-btn:hover .upload-settings-icon {
+  transform: rotate(90deg);
+}
+
+.api-debug-response {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(82 82 82) transparent;
+}
+
+.api-debug-response::-webkit-scrollbar {
+  width: 6px;
+}
+
+.api-debug-response::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background-color: rgb(82 82 82);
+}
+
+.api-debug-response::-webkit-scrollbar-track {
+  background: transparent;
+}
