@@ -38,10 +38,14 @@ data
 git-hooks/
 
 # 本地维护脚本（assign-image-owner、fpk 打包等，不进仓库）
-scripts/
+# 必须根锚定：裸 scripts/ 会把 .github/scripts/ 这类 CI 脚本一并吞掉，推上去 CI 就找不到脚本
+/scripts/
 dist-fpk/
 
 # VitePress docs site
 docs-site/.vitepress/cache
 docs-site/.vitepress/dist
 docs-site/public/screenshots
+
+# WorkBuddy 助手的工作区数据（会话/记忆等），不应进仓库
+.workbuddy/
