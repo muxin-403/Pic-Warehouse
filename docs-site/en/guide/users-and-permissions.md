@@ -1,6 +1,6 @@
 # Users & permissions
 
-PicHost uses role-based access control (RBAC): **admin** and **user**. Enforcement is server-side.
+Pic-Warehouse uses role-based access control (RBAC): **admin** and **user**. Enforcement is server-side.
 
 ## Role capabilities
 
@@ -37,7 +37,7 @@ Regular users see **API**, **Gallery** in the nav; user menu: **Change password*
 - By default only admins create users; **allow registration** is an admin setting
 - Passwords hashed with scrypt
 - Web login/register requires verification: local slider by default; admins can switch to Turnstile or Cap under **Settings → Access control**
-- If verification is misconfigured: `docker exec pichost slider` resets to the local slider
+- If verification is misconfigured: `docker exec pic-warehouse slider` resets to the local slider
 - Login rate limiting
 
 ## Tags

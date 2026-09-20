@@ -1,10 +1,10 @@
 # Dual-domain separation · Recommended deployment
 
-When admin and image domains are split, the admin UI, API, and public image links use different hostnames. PicHost enforces isolation in **application middleware**: the image host only serves image paths; other requests return 404.
+When admin and image domains are split, the admin UI, API, and public image links use different hostnames. Pic-Warehouse enforces isolation in **application middleware**: the image host only serves image paths; other requests return 404.
 
 ## Architecture
 
-**One Docker instance + two domains**, both **fully reverse-proxied** to port `6892` (isolation is handled by PicHost middleware; no path splitting in Nginx).
+**One Docker instance + two domains**, both **fully reverse-proxied** to port `6892` (isolation is handled by Pic-Warehouse middleware; no path splitting in Nginx).
 
 | Domain | Purpose |
 | ------ | ------- |
@@ -32,7 +32,7 @@ server {
   }
 }
 
-# pic.example.com — same full proxy; PicHost middleware blocks non-image paths
+# pic.example.com — same full proxy; Pic-Warehouse middleware blocks non-image paths
 server {
   server_name pic.example.com;
   location / {
@@ -57,7 +57,7 @@ server {
 
 ### Middleware isolation and third hosts
 
-PicHost uses the request **Host** (and `X-Forwarded-Host` when proxied) to decide site vs image domain:
+Pic-Warehouse uses the request **Host** (and `X-Forwarded-Host` when proxied) to decide site vs image domain:
 
 - **Image host**: non-image paths (e.g. `/`, `/settings`) → 404
 - **Site host**: image URL paths (e.g. `/images/...`) → 404
@@ -71,16 +71,16 @@ This is independent of hyphenated or long domain names. Older versions did not b
 2. With Cloudflare **orange-cloud** DNS, restrict the origin firewall to **[Cloudflare IP ranges](https://www.cloudflare.com/ips/)** so traffic cannot bypass the CDN
 3. **Before saving**, read the risk confirmation in Settings / setup; saving via IP, LAN, or a proxy that does not forward Host correctly may lock you out — see **Recovery when locked out** below
 4. Sign in only on the **site hostname** from Settings; do not mix `localhost`, IP, or unlisted domains
-5. Do **not** put Cloudflare Pages / Workers in front of PicHost as a **full-site reverse proxy** (`IMAGE_BASE_URL` may point at a CDN URL, but the app itself should run on Docker/VPS)
-6. If you must proxy at the edge, preserve the client **`Host` or `X-Forwarded-Host`** (Lucky/NPM “force hostname” must match PicHost settings) or isolation fails or you get locked out after save
-7. PicHost **cannot** run as-is on Pages/Workers (needs `node-server`, SQLite, `sharp`, local `data/`). Keep Docker/VPS; use orange-cloud DNS and optional R2 storage on CF
+5. Do **not** put Cloudflare Pages / Workers in front of Pic-Warehouse as a **full-site reverse proxy** (`IMAGE_BASE_URL` may point at a CDN URL, but the app itself should run on Docker/VPS)
+6. If you must proxy at the edge, preserve the client **`Host` or `X-Forwarded-Host`** (Lucky/NPM “force hostname” must match Pic-Warehouse settings) or isolation fails or you get locked out after save
+7. Pic-Warehouse **cannot** run as-is on Pages/Workers (needs `node-server`, SQLite, `sharp`, local `data/`). Keep Docker/VPS; use orange-cloud DNS and optional R2 storage on CF
 
 ### Recovery when locked out
 
 If IP / LAN access returns 404 after a bad save:
 
 ```bash
-docker exec pichost clear-domains
+docker exec pic-warehouse clear-domains
 ```
 
 Local: `npm run clear-domains`. Then reconfigure using the site hostname and verify proxy `Host` headers.
@@ -98,7 +98,7 @@ Full guide: [Cloudflare deployment](./cloudflare-deployment.md).
 | R2 storage | Add an R2 backend under **Storage**; independent of orange cloud |
 | `cloudflare` Git branch | R2-focused deployment line; still Docker, **not** Workers hosting |
 
-**Do not confuse** “Create Worker” in the CF dashboard (Git + `wrangler deploy`) with deploying PicHost — the repo uses `nitro.preset: 'node-server'` and is not Workers-ready.
+**Do not confuse** “Create Worker” in the CF dashboard (Git + `wrangler deploy`) with deploying Pic-Warehouse — the repo uses `nitro.preset: 'node-server'` and is not Workers-ready.
 
 **Do not** chain the image hostname to `fetch(admin…)` via Pages/Workers — that rewrites Host and breaks isolation ([bad topologies](./cloudflare-deployment.md#6-typical-bad-topologies)).
 
@@ -106,14 +106,14 @@ See [Reverse proxy](./reverse-proxy.md#cloudflare-orange-cloud) for origin harde
 
 ## FN NAS · Lucky reverse proxy
 
-In [Lucky](https://github.com/gdy666/lucky), create one **reverse proxy** rule per domain. **Frontend** is the public hostname; **backend** is PicHost on your LAN (e.g. `http://192.168.8.3:6892`).
+In [Lucky](https://github.com/gdy666/lucky), create one **reverse proxy** rule per domain. **Frontend** is the public hostname; **backend** is Pic-Warehouse on your LAN (e.g. `http://192.168.8.3:6892`).
 
 **Site domain (admin)**
 
 | Field | Example |
 | ----- | ------- |
 | Service type | Reverse proxy |
-| Frontend | `admin.pichost.com` |
+| Frontend | `admin.pic-warehouse.com` |
 | Backend | `http://192.168.8.3:6892` |
 
 **Image domain**
@@ -121,10 +121,10 @@ In [Lucky](https://github.com/gdy666/lucky), create one **reverse proxy** rule p
 | Field | Example |
 | ----- | ------- |
 | Service type | Reverse proxy |
-| Frontend | `image.pichost.com` |
+| Frontend | `image.pic-warehouse.com` |
 | Backend | `http://192.168.8.3:6892` |
 
-Both rules can point to the same backend; PicHost applies host-based isolation automatically.
+Both rules can point to the same backend; Pic-Warehouse applies host-based isolation automatically.
 
 ## Environment variables (optional)
 
@@ -140,8 +140,8 @@ See [Environment variables](./configuration.md).
 ### 1. Edit hosts
 
 ```text
-127.0.0.1 admin.pichost.test
-127.0.0.1 pic.pichost.test
+127.0.0.1 admin.pic-warehouse.test
+127.0.0.1 pic.pic-warehouse.test
 ```
 
 Prefer the `.test` TLD; avoid `.local` where it conflicts with mDNS.
@@ -158,8 +158,8 @@ Dev binds `127.0.0.1:3000` by default. If the hostname resolves but the browser 
 
 | Field | Example |
 | ----- | ------- |
-| Site URL | `http://admin.pichost.test:3000` |
-| Image URL | `http://pic.pichost.test:3000` |
+| Site URL | `http://admin.pic-warehouse.test:3000` |
+| Image URL | `http://pic.pic-warehouse.test:3000` |
 
 Always open admin on the **site hostname**, not `localhost` (cookies and Host must match).
 
@@ -167,19 +167,19 @@ Always open admin on the **site hostname**, not `localhost` (cookies and Host mu
 
 | URL | Expected |
 | --- | -------- |
-| `http://admin.pichost.test:3000/` | Admin UI works |
-| `http://admin.pichost.test:3000/images/...` or `/2026/08/xxx.webp` | **404** (use image host) |
-| `http://pic.pichost.test:3000/` | **404** (image host has no admin) |
-| `http://pic.pichost.test:3000/images/...` | Image served |
+| `http://admin.pic-warehouse.test:3000/` | Admin UI works |
+| `http://admin.pic-warehouse.test:3000/images/...` or `/2026/08/xxx.webp` | **404** (use image host) |
+| `http://pic.pic-warehouse.test:3000/` | **404** (image host has no admin) |
+| `http://pic.pic-warehouse.test:3000/images/...` | Image served |
 | `http://localhost:3000/` or `http://127.0.0.1:3000/` | **Admin still loads** (development exception; block unconfigured hosts at proxy in production) |
 
-After upload, copied links should use `pic.pichost.test`; gallery thumbnails should load.
+After upload, copied links should use `pic.pic-warehouse.test`; gallery thumbnails should load.
 
 ## Notes
 
 - Hostnames must **differ** (same machine, different subdomains is fine)
 - Site / image URLs in Settings must **exactly match** proxy `server_name` (including `www` or not)
-- No separate static root on the image domain; unlike EasyImages, PicHost isolates in-app
+- No separate static root on the image domain; unlike EasyImages, Pic-Warehouse isolates in-app
 - Single-domain setups can skip separation and use `IMAGE_BASE_URL` or the request host
 - When Referer protection is enabled, site and image hosts are whitelisted automatically
 

@@ -1,23 +1,23 @@
 <p align="center">
-  <img src="app/assets/image/logo-light.png" alt="PicHost" width="96" />
+  <img src="app/assets/image/logo-light.png" alt="Pic-Warehouse" width="96" />
 </p>
 
-<h1 align="center">PicHost</h1>
+<h1 align="center">Pic-Warehouse</h1>
 
 <p align="center"><strong>Lightweight personal image hosting</strong> · Simple uploads, clean management</p>
 
 <p align="center">Self-hosted / Multi-user / Docker / API / Twikoo · Local disk or object storage</p>
 
 <p align="center">
-  <a href="https://github.com/O96u/PicHost/blob/main/package.json"><img src="https://img.shields.io/github/package-json/v/O96u/PicHost?style=flat-square&color=22c55e" alt="version" /></a>
-  <a href="https://github.com/O96u/PicHost/actions/workflows/ci.yml"><img src="https://github.com/O96u/PicHost/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/muxin-403/Pic-Warehouse/blob/main/package.json"><img src="https://img.shields.io/github/package-json/v/muxin-403/Pic-Warehouse?style=flat-square&color=22c55e" alt="version" /></a>
+  <a href="https://github.com/muxin-403/Pic-Warehouse/actions/workflows/ci.yml"><img src="https://github.com/muxin-403/Pic-Warehouse/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <img src="https://img.shields.io/badge/Nuxt-4-00DC82?style=flat-square&logo=nuxt.js&logoColor=white" alt="Nuxt 4" />
-  <a href="https://hub.docker.com/r/muxui/pichost"><img src="https://img.shields.io/badge/Docker-muxui%2Fpichost-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" /></a>
+  <a href="https://github.com/muxin-403/Pic-Warehouse/pkgs/container/pic-warehouse"><img src="https://img.shields.io/badge/GHCR-muxin--403%2Fpic--warehouse-2496ED?style=flat-square&logo=github&logoColor=white" alt="GHCR" /></a>
   <img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square" alt="GPL-3.0" />
 </p>
 
 <p align="center">
-  <a href="https://o96u.github.io/PicHost/en/">Docs</a> ·
+  <a href="https://muxin-403.github.io/Pic-Warehouse/en/">Docs</a> ·
   <a href="#screenshots">Screenshots</a> ·
   <a href="#features">Features</a> ·
   <a href="#tech-stack">Tech Stack</a> ·
@@ -79,20 +79,20 @@
 
 ```bash
 docker run -d \
-  --name pichost \
+  --name pic-warehouse \
   -p 6892:6892 \
   -v ./data:/data \
   --restart unless-stopped \
-  muxui/pichost:latest
+  ghcr.io/muxin-403/pic-warehouse:latest
 ```
 
 Open `http://<host>:6892` and complete the setup wizard.
 
-**Full guide** (env vars, upgrades, dual-domain setup, API, Twikoo, reverse proxy, local dev, etc.): **[Documentation](https://o96u.github.io/PicHost/en/)**.
+**Full guide** (env vars, upgrades, dual-domain setup, API, Twikoo, reverse proxy, local dev, etc.): **[Documentation](https://muxin-403.github.io/Pic-Warehouse/en/)**.
 
 | Branch | Notes |
 | ------ | ----- |
-| [**main**](https://github.com/O96u/PicHost/tree/main) | Default: multi-backend, dual-domain, unified `images/` storage |
+| [**main**](https://github.com/muxin-403/Pic-Warehouse/tree/main) | Default: multi-backend, dual-domain, unified `images/` storage |
 | [**cloudflare**](https://github.com/O96u/PicHost/tree/cloudflare) | Cloudflare R2 only; live demo [pic.roven.cc](https://pic.roven.cc) |
 
 ## License

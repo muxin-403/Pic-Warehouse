@@ -1,6 +1,6 @@
 # Cloudflare & preferred-edge deployment
 
-In dual-domain mode, PicHost distinguishes **site** vs **image** traffic from the request **Host** (and `X-Forwarded-Host` from a trusted reverse proxy). Cloudflare orange cloud, preferred-edge IPs, Workers, and Pages are all fine — as long as the hostname identity reaching PicHost stays correct.
+In dual-domain mode, Pic-Warehouse distinguishes **site** vs **image** traffic from the request **Host** (and `X-Forwarded-Host` from a trusted reverse proxy). Cloudflare orange cloud, preferred-edge IPs, Workers, and Pages are all fine — as long as the hostname identity reaching Pic-Warehouse stays correct.
 
 > **One-line rule:** The network path may change; the hostname identity must not — `admin → admin`, `img → img`, never `img → admin`.
 
@@ -16,14 +16,14 @@ See [Dual-domain separation](./domain-separation.md) for middleware behavior and
 | 2 | Pages / Worker in the middle | Image host must **not** `fetch(admin…)` |
 | 3 | Reverse-proxy upstream | Both hostnames → `http://127.0.0.1:6892` |
 | 4 | Nginx `proxy_set_header Host` | `$host` (preserve client hostname) |
-| 5 | PicHost settings | `SITE_BASE_URL` / `IMAGE_BASE_URL` match `server_name` |
+| 5 | Pic-Warehouse settings | `SITE_BASE_URL` / `IMAGE_BASE_URL` match `server_name` |
 | 6 | Port `6892` | Reachable only from localhost or internal proxy |
 
 ---
 
 ## Recommended layout
 
-Both hostnames go through Cloudflare (proxied) and **independently** reverse-proxy to one PicHost instance:
+Both hostnames go through Cloudflare (proxied) and **independently** reverse-proxy to one Pic-Warehouse instance:
 
 ```mermaid
 flowchart TB
@@ -32,7 +32,7 @@ flowchart TB
   admin[admin.example.com]
   img[img.example.com]
   panel[1Panel / Nginx]
-  app[PicHost :6892]
+  app[Pic-Warehouse :6892]
 
   internet --> cf
   cf --> admin
@@ -52,7 +52,7 @@ admin.example.com → http://127.0.0.1:6892
 img.example.com   → http://127.0.0.1:6892
 ```
 
-You do **not** need separate ports for “frontend / backend / images” — one PicHost instance on port `6892` is enough.
+You do **not** need separate ports for “frontend / backend / images” — one Pic-Warehouse instance on port `6892` is enough.
 
 ### Site hostname ≠ frontend domain
 
@@ -61,7 +61,7 @@ You do **not** need separate ports for “frontend / backend / images” — one
 | `admin.example.com` | Admin UI, login, settings, gallery, API, upload |
 | `img.example.com` | Image delivery, hotlinks, CDN |
 
-Use **site / image hostname**, not “frontend / backend”. PicHost does **not** require `frontend :3000 + backend :6892` in production.
+Use **site / image hostname**, not “frontend / backend”. Pic-Warehouse does **not** require `frontend :3000 + backend :6892` in production.
 
 ---
 
@@ -74,13 +74,13 @@ admin.example.com, img.example.com
   A/CNAME → origin → Proxied
 ```
 
-Opening `admin.example.com` should yield `Host: admin.example.com` at PicHost; `img.example.com` should yield `Host: img.example.com`.
+Opening `admin.example.com` should yield `Host: admin.example.com` at Pic-Warehouse; `img.example.com` should yield `Host: img.example.com`.
 
 **Preferred-edge** setups (alternate IPs, entry hostnames) are also fine. Preferred routing may change the path to Cloudflare’s edge, but must **not** rewrite the image hostname’s origin identity to the site hostname:
 
 ```text
-admin → CF → admin.example.com → origin → PicHost
-img   → CF → img.example.com   → origin → PicHost
+admin → CF → admin.example.com → origin → Pic-Warehouse
+img   → CF → img.example.com   → origin → Pic-Warehouse
 ```
 
 ---
@@ -96,12 +96,12 @@ flowchart LR
   user[User on img.example.com]
   worker[Pages / Worker]
   admin[fetch admin.example.com]
-  app[PicHost]
+  app[Pic-Warehouse]
 
   user --> worker --> admin --> app
 ```
 
-The last hop has `Host: admin.example.com`, so PicHost treats it as site traffic — `https://img.example.com/` may show the admin UI. This is **Host rewrite**, not a cache bug.
+The last hop has `Host: admin.example.com`, so Pic-Warehouse treats it as site traffic — `https://img.example.com/` may show the admin UI. This is **Host rewrite**, not a cache bug.
 
 ### ❌ Bad 2: Preferred proxy upstreams to site host
 
@@ -114,7 +114,7 @@ Even for routing only, using the site hostname as upstream breaks image isolatio
 ### ❌ Bad 3: Public exposure of port 6892
 
 ```text
-any host / IP:6892 → PicHost
+any host / IP:6892 → Pic-Warehouse
 ```
 
 Users can bypass Cloudflare and Nginx `server_name` rules. Port `6892` should be reachable only from `127.0.0.1` or an internal reverse proxy.
@@ -122,17 +122,17 @@ Users can bypass Cloudflare and Nginx `server_name` rules. Port `6892` should be
 ### ✅ Correct pattern
 
 ```text
-admin → admin → PicHost
-img   → img   → PicHost
+admin → admin → Pic-Warehouse
+img   → img   → Pic-Warehouse
 ```
 
-Do **not** use Pages / Workers as a **full-site reverse proxy** for PicHost (extra `pages.dev` / `workers.dev` entry points). PicHost needs `node-server`, SQLite, `sharp`, and local `data/` — it **cannot** run as a Node app on Pages/Workers. Keep Docker/VPS for the app; use orange-cloud DNS and optional R2 on CF.
+Do **not** use Pages / Workers as a **full-site reverse proxy** for Pic-Warehouse (extra `pages.dev` / `workers.dev` entry points). Pic-Warehouse needs `node-server`, SQLite, `sharp`, and local `data/` — it **cannot** run as a Node app on Pages/Workers. Keep Docker/VPS for the app; use orange-cloud DNS and optional R2 on CF.
 
 ---
 
 ## Workers / Pages guidance
 
-If you only need headers, auth, Referer rules, logging, or cache — and PicHost remains your origin:
+If you only need headers, auth, Referer rules, logging, or cache — and Pic-Warehouse remains your origin:
 
 | Prefer | Avoid |
 | ------ | ----- |
@@ -196,15 +196,15 @@ Use reverse proxy and application layers **together**:
 | Layer | Role |
 | ----- | ---- |
 | **Nginx default server** | Reject bare IP, `pages.dev`, and other undeclared hostnames |
-| **PicHost middleware (v1.2.x+)** | When dual-domain is on, unconfigured hosts get 404 at the app (`localhost` / `127.0.0.1` exempt in development) |
+| **Pic-Warehouse middleware (v1.2.x+)** | When dual-domain is on, unconfigured hosts get 404 at the app (`localhost` / `127.0.0.1` exempt in development) |
 
-Even with app-layer blocking, keep a default server at the proxy to reduce junk traffic to PicHost.
+Even with app-layer blocking, keep a default server at the proxy to reduce junk traffic to Pic-Warehouse.
 
 ---
 
 ## X-Forwarded-Host
 
-PicHost may consult `X-Forwarded-Host` behind a reverse proxy, but that header is **forgeable** by clients. Therefore:
+Pic-Warehouse may consult `X-Forwarded-Host` behind a reverse proxy, but that header is **forgeable** by clients. Therefore:
 
 - Do not expose port `6892` publicly
 - Only trusted proxies should reach the app
@@ -223,7 +223,7 @@ Cache issues usually mean stale JS/CSS/images or occasional 404s. If `/`, `/logi
 ② Pages / Worker / preferred proxy in the middle?
 ③ What URL does the proxy fetch?
 ④ Does it fetch admin.example.com?
-⑤ Which Host does 1Panel / PicHost see?
+⑤ Which Host does 1Panel / Pic-Warehouse see?
 ```
 
 ---

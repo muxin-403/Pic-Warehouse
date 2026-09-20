@@ -1,6 +1,6 @@
 # API
 
-PicHost 提供 REST 接口与 Twikoo 兼容端点。登录后打开顶栏 **API** 页：左侧为接口目录与 Token 管理，中间为参数说明与 cURL 示例，右侧可 **在线调试** 发送请求。
+Pic-Warehouse 提供 REST 接口与 Twikoo 兼容端点。登录后打开顶栏 **API** 页：左侧为接口目录与 Token 管理，中间为参数说明与 cURL 示例，右侧可 **在线调试** 发送请求。
 
 ![API 文档与在线调试](/screenshots/api.png)
 

@@ -1,13 +1,13 @@
 # 双域名分离 · 推荐部署架构
 
-启用「后台与图片域名分离」后，管理后台、API 与图片直链使用不同域名。PicHost 通过 **Host 中间件** 双向隔离：
+启用「后台与图片域名分离」后，管理后台、API 与图片直链使用不同域名。Pic-Warehouse 通过 **Host 中间件** 双向隔离：
 
 - **网站域**：后台、API、上传；**禁止**直链出图（图片路径返回 404）
 - **图片域**：仅放行图片路径；其余请求返回 404
 
 ## 架构说明
 
-**单 Docker 实例 + 两个域名**，均可 **全量反代** 到 `6892`（隔离由 PicHost 中间件负责，无需在 Nginx 层拆分路径）。
+**单 Docker 实例 + 两个域名**，均可 **全量反代** 到 `6892`（隔离由 Pic-Warehouse 中间件负责，无需在 Nginx 层拆分路径）。
 
 | 域名 | 用途 |
 | ---- | ---- |
@@ -35,7 +35,7 @@ server {
   }
 }
 
-# pic.example.com — 同样全量反代；PicHost 中间件会拦截非图片路径
+# pic.example.com — 同样全量反代；Pic-Warehouse 中间件会拦截非图片路径
 server {
   server_name pic.example.com;
   location / {
@@ -60,7 +60,7 @@ server {
 
 ### 中间件隔离与第三 Host
 
-PicHost 根据请求 **Host**（反代会转发为 `X-Forwarded-Host`，应用会一并识别）判断当前是网站域还是图片域：
+Pic-Warehouse 根据请求 **Host**（反代会转发为 `X-Forwarded-Host`，应用会一并识别）判断当前是网站域还是图片域：
 
 - **图片域**：非图片路径（如 `/`、`/settings`）→ 404
 - **网站域**：图片直链路径（如 `/images/...`）→ 404
@@ -74,16 +74,16 @@ PicHost 根据请求 **Host**（反代会转发为 `X-Forwarded-Host`，应用�
 2. 使用 Cloudflare **橙云** 时，源站防火墙 **仅放行 [Cloudflare IP 段](https://www.cloudflare.com/ips/)**，避免绕过 CDN 直连源站
 3. **保存前**阅读设置 / 初始化页的风险确认；若通过 IP、内网或未正确传递 Host 的反代保存，可能锁死后台；恢复见下方「已锁死时的恢复」
 4. **仅使用** 设置中的网站域名登录后台，不要用 `localhost`、IP 或未配置的域名混用
-5. **不要** 用 Cloudflare Pages / Workers 对 PicHost **整站反代**（会多出 `pages.dev` / `workers.dev` 等第三入口；`IMAGE_BASE_URL` 可填 CDN 公网地址，但应用本体应 Docker/VPS 部署）
-6. 若必须在边缘做反代，须保留客户端 **`Host` 或 `X-Forwarded-Host`**（Lucky/NPM「强制域名」须与 PicHost 配置一致），否则 Host 隔离会失效或保存后被锁死
-7. PicHost **不能** 作为 Node 应用直接部署到 Pages/Workers（依赖 `node-server`、SQLite、`sharp` 与本地 `data/`）；应用请继续 Docker/VPS 部署，CF 侧用橙云 DNS + 可选 R2 存储即可
+5. **不要** 用 Cloudflare Pages / Workers 对 Pic-Warehouse **整站反代**（会多出 `pages.dev` / `workers.dev` 等第三入口；`IMAGE_BASE_URL` 可填 CDN 公网地址，但应用本体应 Docker/VPS 部署）
+6. 若必须在边缘做反代，须保留客户端 **`Host` 或 `X-Forwarded-Host`**（Lucky/NPM「强制域名」须与 Pic-Warehouse 配置一致），否则 Host 隔离会失效或保存后被锁死
+7. Pic-Warehouse **不能** 作为 Node 应用直接部署到 Pages/Workers（依赖 `node-server`、SQLite、`sharp` 与本地 `data/`）；应用请继续 Docker/VPS 部署，CF 侧用橙云 DNS + 可选 R2 存储即可
 
 ### 已锁死时的恢复
 
 若已误保存导致 IP / 内网地址全站 404：
 
 ```bash
-docker exec pichost clear-domains
+docker exec pic-warehouse clear-domains
 ```
 
 本地：`npm run clear-domains`。清除后请用网站域名重新配置，并确认反代 `Host` 头正确。
@@ -96,12 +96,12 @@ docker exec pichost clear-domains
 
 | 能力 | 说明 |
 | ---- | ---- |
-| 橙云 CDN | 与 PicHost 双域名兼容；回源须保留 `Host`、`X-Forwarded-Proto` |
+| 橙云 CDN | 与 Pic-Warehouse 双域名兼容；回源须保留 `Host`、`X-Forwarded-Proto` |
 | DNS 优选 | 仅改变用户连到 CF 边缘的 IP；**admin → admin、img → img** 的回源身份不能变 |
 | R2 对象存储 | 在 **存储** 页添加 R2 后端即可，与是否橙云无关 |
 | `cloudflare` Git 分支 | R2 专用部署线，仍是 Docker 运行，**不是** Workers 托管 |
 
-**勿混淆：** CF 控制台「创建 Worker」并连接本仓库 **无法** 直接部署 PicHost；`npm run build` + `wrangler deploy` 与当前 `node-server` 预设不兼容。
+**勿混淆：** CF 控制台「创建 Worker」并连接本仓库 **无法** 直接部署 Pic-Warehouse；`npm run build` + `wrangler deploy` 与当前 `node-server` 预设不兼容。
 
 **勿用 Pages/Worker 把图片域 `fetch` 到管理域** — 会破坏 Host 隔离（详见 [Cloudflare 部署说明 · 典型错误拓扑](./cloudflare-deployment.md#六典型错误拓扑)）。
 
@@ -109,14 +109,14 @@ docker exec pichost clear-domains
 
 ## 飞牛 NAS · Lucky 反向代理
 
-在 [Lucky](https://github.com/gdy666/lucky) 中为两个域名各建一条 **反向代理** 规则，**前端地址** 填公网域名，**后端地址** 填 PicHost 所在内网 IP 与端口（如 `http://192.168.8.3:6892`）。
+在 [Lucky](https://github.com/gdy666/lucky) 中为两个域名各建一条 **反向代理** 规则，**前端地址** 填公网域名，**后端地址** 填 Pic-Warehouse 所在内网 IP 与端口（如 `http://192.168.8.3:6892`）。
 
 **网站域名（管理后台）**
 
 | 项 | 示例值 |
 | -- | ------ |
 | 服务类型 | 反向代理 |
-| 前端地址 | `admin.pichost.com` |
+| 前端地址 | `admin.pic-warehouse.com` |
 | 后端地址 | `http://192.168.8.3:6892` |
 
 **图片域名**
@@ -124,10 +124,10 @@ docker exec pichost clear-domains
 | 项 | 示例值 |
 | -- | ------ |
 | 服务类型 | 反向代理 |
-| 前端地址 | `image.pichost.com` |
+| 前端地址 | `image.pic-warehouse.com` |
 | 后端地址 | `http://192.168.8.3:6892` |
 
-两条规则的后端地址相同即可；域名分离与路径隔离由 PicHost 根据请求 `Host` 自动处理。
+两条规则的后端地址相同即可；域名分离与路径隔离由 Pic-Warehouse 根据请求 `Host` 自动处理。
 
 ## 环境变量（可选）
 
@@ -145,8 +145,8 @@ IMAGE_BASE_URL=https://pic.example.com
 ### 1. 修改 hosts
 
 ```text
-127.0.0.1 admin.pichost.test
-127.0.0.1 pic.pichost.test
+127.0.0.1 admin.pic-warehouse.test
+127.0.0.1 pic.pic-warehouse.test
 ```
 
 建议使用 `.test` 后缀，避免 `.local` 在部分系统上与 mDNS 冲突。
@@ -163,8 +163,8 @@ npm run dev
 
 | 项 | 示例 |
 | -- | ---- |
-| 网站域名 | `http://admin.pichost.test:3000` |
-| 图片域名 | `http://pic.pichost.test:3000` |
+| 网站域名 | `http://admin.pic-warehouse.test:3000` |
+| 图片域名 | `http://pic.pic-warehouse.test:3000` |
 
 **后台请始终用网站域名打开**，不要用 `localhost`（Cookie 与 Host 不一致）。
 
@@ -172,19 +172,19 @@ npm run dev
 
 | 地址 | 预期 |
 | ---- | ---- |
-| `http://admin.pichost.test:3000/` | 正常进入后台 |
-| `http://admin.pichost.test:3000/images/...` 或 `/2026/08/xxx.webp` | **404**（请用图片域直链） |
-| `http://pic.pichost.test:3000/` | **404**（正常，图片域不提供后台） |
-| `http://pic.pichost.test:3000/images/...` | 能出图 |
+| `http://admin.pic-warehouse.test:3000/` | 正常进入后台 |
+| `http://admin.pic-warehouse.test:3000/images/...` 或 `/2026/08/xxx.webp` | **404**（请用图片域直链） |
+| `http://pic.pic-warehouse.test:3000/` | **404**（正常，图片域不提供后台） |
+| `http://pic.pic-warehouse.test:3000/images/...` | 能出图 |
 | `http://localhost:3000/` 或 `http://127.0.0.1:3000/` | **能打开后台**（开发环境例外；生产须用反代封禁未配置 Host） |
 
-上传一张图后，复制链接应指向 `pic.pichost.test` 域名；在后台图库中缩略图也应能正常显示。
+上传一张图后，复制链接应指向 `pic.pic-warehouse.test` 域名；在后台图库中缩略图也应能正常显示。
 
 ## 相关说明
 
 - 两个域名 **主机名不能相同**（可同机、不同子域）
 - 设置里的网站域 / 图片域须与反代 `server_name` **完全一致**（含是否带 `www`）
-- 图片域无需单独部署静态目录；与 EasyImages 等不同，PicHost 在应用内完成隔离
+- 图片域无需单独部署静态目录；与 EasyImages 等不同，Pic-Warehouse 在应用内完成隔离
 - 单域名部署可不启用分离，仅配置 `IMAGE_BASE_URL` 或使用默认当前访问域名
 - 配置了 Referer 防盗链时，网站域与图片域会自动加入白名单，无需手写两个域名
 

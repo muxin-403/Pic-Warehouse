@@ -1,6 +1,6 @@
 # Twikoo
 
-PicHost supports **Twikoo** and **EasyImage 2.0** image upload — configure your comment system like EasyImage.
+Pic-Warehouse supports **Twikoo** and **EasyImage 2.0** image upload — configure your comment system like EasyImage.
 
 ## Twikoo settings
 
@@ -11,7 +11,7 @@ PicHost supports **Twikoo** and **EasyImage 2.0** image upload — configure you
 | `IMAGE_CDN_TOKEN` | Same as global `API_UPLOAD_TOKEN` |
 
 - Use your **site hostname** (admin domain) in `IMAGE_CDN_URL`
-- Generate the token in PicHost **API** or set `API_UPLOAD_TOKEN`
+- Generate the token in Pic-Warehouse **API** or set `API_UPLOAD_TOKEN`
 
 ## Upload endpoint
 
@@ -35,7 +35,7 @@ Files are stored under `images/` and owned by the **global token** account (admi
 | Aspect | REST `/api/images/upload` | Twikoo `/api/index.php` |
 | ------ | ------------------------- | ------------------------ |
 | Auth | `Auth-Token` header | form `token` |
-| Response | PicHost JSON | EasyImage-compatible JSON |
+| Response | Pic-Warehouse JSON | EasyImage-compatible JSON |
 | Token | Global or personal | Global only |
 
 ## Dual-domain

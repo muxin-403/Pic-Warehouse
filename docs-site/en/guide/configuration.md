@@ -1,6 +1,6 @@
 # Environment variables
 
-Configure PicHost via environment variables (Docker / `.env`) or the in-app **Settings** page. Admins use **Settings** (`/settings`) with sidebar sections **Basic**, **Domains & paths**, **Access control**, **Tag management**, and **Activity log**. Most values prefer **SQLite** when saved; some env vars override or lock UI editing.
+Configure Pic-Warehouse via environment variables (Docker / `.env`) or the in-app **Settings** page. Admins use **Settings** (`/settings`) with sidebar sections **Basic**, **Domains & paths**, **Access control**, **Tag management**, and **Activity log**. Most values prefer **SQLite** when saved; some env vars override or lock UI editing.
 
 ![Settings](/screenshots/settings-en.png)
 
@@ -77,7 +77,7 @@ Configure under **Settings → Access control** (stored in SQLite; no env vars):
 | **Cloudflare Turnstile** | Site key + secret key |
 | **Cap** | API endpoint + secret |
 
-Login and registration share the same method. If misconfigured: `docker exec pichost slider` (or `npm run slider`) resets to the slider.
+Login and registration share the same method. If misconfigured: `docker exec pic-warehouse slider` (or `npm run slider`) resets to the slider.
 
 ### Storage backends (optional)
 
@@ -87,8 +87,8 @@ Admins usually add backends in **Storage** UI; env vars such as `STORAGE_BACKEND
 
 ```yaml
 services:
-  pichost:
-    image: muxui/pichost:latest
+$1pic-warehouse:$2
+    image: ghcr.io/muxin-403/pic-warehouse:latest
     ports:
       - "6892:6892"
     volumes:
@@ -116,4 +116,4 @@ Restart the container after changing env vars.
 | Auto-delete | `AUTO_DELETE_DAYS` |
 | Login verification | (Settings → Access control only) |
 
-Template: [`.env.example`](https://github.com/O96u/PicHost/blob/main/.env.example) in the repo root.
+Template: [`.env.example`](https://github.com/muxin-403/Pic-Warehouse/blob/main/.env.example) in the repo root.

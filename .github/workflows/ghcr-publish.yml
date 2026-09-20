@@ -126,7 +126,7 @@ jobs:
             type=sha,format=short,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.title=PicHost
+            org.opencontainers.image.title=Pic-Warehouse
             org.opencontainers.image.description=自托管图床：Nuxt 管理端、本地磁盘或 S3 兼容存储、服务端 WebP 压缩
             org.opencontainers.image.licenses=GPL-3.0-only
 

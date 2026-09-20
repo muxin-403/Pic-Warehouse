@@ -1,6 +1,6 @@
 # 快速开始
 
-PicHost 适合在 NAS、家用服务器或 VPS 上自托管图床。推荐用 Docker 部署，首次访问通过 Web 向导创建管理员。
+Pic-Warehouse 适合在 NAS、家用服务器或 VPS 上自托管图床。推荐用 Docker 部署，首次访问通过 Web 向导创建管理员。
 
 ## 在线体验
 
@@ -13,11 +13,11 @@ PicHost 适合在 NAS、家用服务器或 VPS 上自托管图床。推荐用 Do
 
 ```bash
 docker run -d \
-  --name pichost \
+  --name pic-warehouse \
   -p 6892:6892 \
   -v ./data:/data \
   --restart unless-stopped \
-  muxui/pichost:latest
+  ghcr.io/muxin-403/pic-warehouse:latest
 ```
 
 默认端口 **6892**。浏览器打开 `http://<主机IP>:6892`，按引导创建管理员即可。
@@ -62,7 +62,7 @@ docker compose up -d
 若 Turnstile / Cap 配置错误导致无法登录，可在服务器上重置为本地滑块：
 
 ```bash
-docker exec pichost slider
+docker exec pic-warehouse slider
 ```
 
 本地开发：`npm run slider`
@@ -73,10 +73,10 @@ docker exec pichost slider
 
 ```bash
 # 无参数：重置管理员（仅当系统中只有一个管理员时）
-docker exec pichost reset-password
+docker exec pic-warehouse reset-password
 
 # 指定用户名：可重置管理员或普通用户
-docker exec pichost reset-password 用户名
+docker exec pic-warehouse reset-password 用户名
 ```
 
 终端会打印随机新密码；用户不存在时会报错。登录后请到「修改密码」更换。
@@ -88,7 +88,7 @@ docker exec pichost reset-password 用户名
 若启用双域名后通过 IP / 内网地址无法进入后台：
 
 ```bash
-docker exec pichost clear-domains
+docker exec pic-warehouse clear-domains
 ```
 
 本地：`npm run clear-domains`。详见 [常见问题 — 双域名配置后后台 404](./faq.md#双域名配置后后台-404-进不去)。

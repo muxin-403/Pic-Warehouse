@@ -1,6 +1,6 @@
-# PicHost 文档
+# Pic-Warehouse 文档
 
-欢迎使用 PicHost 用户文档。本站为完整指南的单一事实来源；仓库 README 保留特性摘要与快速开始。
+欢迎使用 Pic-Warehouse 用户文档。本站为完整指南的单一事实来源；仓库 README 保留特性摘要与快速开始。
 
 ## 推荐阅读顺序
 
@@ -46,7 +46,7 @@
 
 | 分支 | 说明 |
 | ---- | ---- |
-| [**main**](https://github.com/O96u/PicHost/tree/main) | 主线：多后端、双域名、统一 `images/` 存储；界面见上表 |
+| [**main**](https://github.com/muxin-403/Pic-Warehouse/tree/main) | 主线：多后端、双域名、统一 `images/` 存储；界面见上表 |
 | [**cloudflare**](https://github.com/O96u/PicHost/tree/cloudflare) | 仅 Cloudflare R2；在线演示 [pic.roven.cc](https://pic.roven.cc) |
 
 需要多种云存储或完整管理界面请用 **main**；图床只接 R2 可选用 **cloudflare** 分支。

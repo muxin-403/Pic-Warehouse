@@ -1,4 +1,4 @@
-PicHost 支持通过环境变量（Docker / `.env`）与后台 **设置** 页配置。管理员在 **设置与偏好**（`/settings`）左侧切换 **基础设置**、**域名与路径**、**访问控制**、**标签管理**、**操作日志**；多数项 **SQLite 优先**；部分项环境变量可覆盖或锁定后台编辑。
+Pic-Warehouse 支持通过环境变量（Docker / `.env`）与后台 **设置** 页配置。管理员在 **设置与偏好**（`/settings`）左侧切换 **基础设置**、**域名与路径**、**访问控制**、**标签管理**、**操作日志**；多数项 **SQLite 优先**；部分项环境变量可覆盖或锁定后台编辑。
 
 ![基础设置](/screenshots/settings.png)
 
@@ -75,7 +75,7 @@ PicHost 支持通过环境变量（Docker / `.env`）与后台 **设置** 页配
 | **Cloudflare Turnstile** | 填写 Site Key 与 Secret Key |
 | **Cap** | 填写 API Endpoint 与 Secret |
 
-登录与注册共用同一验证方式。若第三方配置错误导致无法登录，执行 `docker exec pichost slider`（或 `npm run slider`）恢复为本地滑块。
+登录与注册共用同一验证方式。若第三方配置错误导致无法登录，执行 `docker exec pic-warehouse slider`（或 `npm run slider`）恢复为本地滑块。
 
 ### 存储后端（可选）
 
@@ -85,8 +85,8 @@ PicHost 支持通过环境变量（Docker / `.env`）与后台 **设置** 页配
 
 ```yaml
 services:
-  pichost:
-    image: muxui/pichost:latest
+$1pic-warehouse:$2
+    image: ghcr.io/muxin-403/pic-warehouse:latest
     ports:
       - "6892:6892"
     volumes:
@@ -114,4 +114,4 @@ services:
 | 自动删除 | `AUTO_DELETE_DAYS` |
 | 登录验证 | （仅后台 **设置 → 访问控制**） |
 
-完整模板见仓库根目录 [`.env.example`](https://github.com/O96u/PicHost/blob/main/.env.example)。
+完整模板见仓库根目录 [`.env.example`](https://github.com/muxin-403/Pic-Warehouse/blob/main/.env.example)。

@@ -1,6 +1,6 @@
 # Twikoo
 
-PicHost 兼容 **Twikoo** 与 **EasyImage 2.0** 图片上传协议，评论系统可像接 EasyImage 一样配置。
+Pic-Warehouse 兼容 **Twikoo** 与 **EasyImage 2.0** 图片上传协议，评论系统可像接 EasyImage 一样配置。
 
 ## Twikoo 配置
 
@@ -13,7 +13,7 @@ PicHost 兼容 **Twikoo** 与 **EasyImage 2.0** 图片上传协议，评论系�
 | `IMAGE_CDN_TOKEN` | 与全局 `API_UPLOAD_TOKEN` 相同 |
 
 - 使用 **网站域名**（管理后台域）作为 `IMAGE_CDN_URL` 的主机名
-- Token 需在 PicHost **API** 页生成，或通过 `API_UPLOAD_TOKEN` 环境变量设置
+- Token 需在 Pic-Warehouse **API** 页生成，或通过 `API_UPLOAD_TOKEN` 环境变量设置
 
 ## 上传接口
 
@@ -39,7 +39,7 @@ curl -X POST "https://admin.example.com/api/index.php" \
 | 项目 | REST `/api/images/upload` | Twikoo `/api/index.php` |
 | ---- | ------------------------- | ------------------------ |
 | 鉴权 | `Auth-Token` 请求头 | 表单 `token` |
-| 响应格式 | PicHost JSON | EasyImage 兼容 JSON |
+| 响应格式 | Pic-Warehouse JSON | EasyImage 兼容 JSON |
 | Token | 全局或个人 | 仅全局 Token |
 
 ## 双域名部署

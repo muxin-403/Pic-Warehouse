@@ -1,16 +1,16 @@
 services:
-  pichost:
-    # Docker Hub 镜像（推送 main 分支后由 GitHub Actions 自动构建）
-    # 飞牛 Docker 对 Docker Hub 的「更新镜像」支持更好
-    image: muxui/pichost:latest
+  pic-warehouse:
+    # GHCR 官方镜像（推送 main 分支或 v* 标签后由 GitHub Actions 自动构建，amd64/arm64 双架构）
+    # 镜像为公开包，无需登录即可拉取；NAS 面板若不支持 GHCR，可手动 docker pull 后 retag
+    image: ghcr.io/muxin-403/pic-warehouse:latest
     pull_policy: always
-    container_name: pichost
+    container_name: pic-warehouse
     restart: unless-stopped
     ports:
       - "6892:6892"
     # 首次访问 Web 引导创建管理员，无需预先配置环境变量
     # 可选：environment 中设置 API_UPLOAD_TOKEN、ALLOWED_REFERER_HOSTS 等
-    # 运维：docker exec pichost reset-password | slider | clear-domains | backup-export | backup-restore | storage-sync
+    # 运维：docker exec pic-warehouse reset-password | slider | clear-domains | backup-export | backup-restore | storage-sync
     volumes:
-      # 冒号左边改成 NAS 上的实际存图目录（飞牛示例：/vol1/1000/pichost-data）
+      # 冒号左边改成 NAS 上的实际存图目录（飞牛示例：/vol1/1000/pic-warehouse-data）
       - ./data:/data

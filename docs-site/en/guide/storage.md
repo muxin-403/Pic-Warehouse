@@ -1,6 +1,6 @@
 # Storage
 
-PicHost supports **local disk**, **S3-compatible object storage** (Cloudflare R2, Tencent COS, Alibaba OSS, AWS S3, etc.) and **WebDAV**. Admins manage backends at **Storage** (`/storage`); new uploads go to the **default** backend. The page shows a **storage overview** (total, used, remaining, usage rate, capacity chart) plus per-backend cards and supported backend types.
+Pic-Warehouse supports **local disk**, **S3-compatible object storage** (Cloudflare R2, Tencent COS, Alibaba OSS, AWS S3, etc.) and **WebDAV**. Admins manage backends at **Storage** (`/storage`); new uploads go to the **default** backend. The page shows a **storage overview** (total, used, remaining, usage rate, capacity chart) plus per-backend cards and supported backend types.
 
 ![Storage management](/screenshots/storage.png)
 
@@ -38,7 +38,7 @@ Pick the **WebDAV** preset and fill in four fields:
 | **Server URL** | WebDAV endpoint, may include a path prefix, e.g. `https://dav.example.com/remote.php/dav/files/user` |
 | **Storage path** | Subfolder for images (e.g. `pichost`); leave empty to write to the server URL root. Missing folders are created automatically via `MKCOL` |
 | **Username / Password** | Basic-auth credentials; leave empty for anonymous access. When editing, an empty password keeps the stored one |
-| Serving mode | WebDAV rarely has its own CDN — keep **proxy** so PicHost serves images from the same origin |
+| Serving mode | WebDAV rarely has its own CDN — keep **proxy** so Pic-Warehouse serves images from the same origin |
 
 Objects are stored at `{server URL}/{storage path}/{image key}`, e.g. `https://dav.example.com/remote.php/dav/files/user/pichost/images/2026/09/xxx.webp`.
 
@@ -69,7 +69,7 @@ Some installs seed a default backend via environment variables:
 
 | Mode | Behavior |
 | ---- | -------- |
-| **proxy** | Serve via PicHost (`GET /images/...`) |
+| **proxy** | Serve via Pic-Warehouse (`GET /images/...`) |
 | **public** | 302 redirect to bucket/CDN public URL |
 
 Copied links use **IMAGE_BASE_URL**. “Hide folder prefix” may shorten URLs; the server resolves by path or basename.
@@ -103,11 +103,11 @@ The **Backup & migration** panel has three action cards and a paginated **Recent
 ### CLI
 
 ```bash
-docker exec pichost backup-export
-docker exec pichost backup-restore /data/backups/pichost-xxx.phost.tar.gz
-docker exec pichost backup-restore /data/backups/pichost-xxx.phost.tar.gz --overwrite
-docker exec pichost storage-sync --from local --to s3-xxx --dry-run
-docker exec pichost storage-sync --from local --to s3-xxx --set-default
+docker exec pic-warehouse backup-export
+docker exec pic-warehouse backup-restore /data/backups/pichost-xxx.phost.tar.gz
+docker exec pic-warehouse backup-restore /data/backups/pichost-xxx.phost.tar.gz --overwrite
+docker exec pic-warehouse storage-sync --from local --to s3-xxx --dry-run
+docker exec pic-warehouse storage-sync --from local --to s3-xxx --set-default
 ```
 
 Local development (project root):

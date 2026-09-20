@@ -4,7 +4,7 @@
 # 用法：
 #   bash .github/scripts/container-check.sh <image:tag> <platform> <arch> <machine> <host-port> [--pull]
 # 示例：
-#   bash .github/scripts/container-check.sh ghcr.io/o96u/pichost:sha-abc1234 linux/arm64 arm64 aarch64 6893 --pull
+#   bash .github/scripts/container-check.sh ghcr.io/muxin-403/pic-warehouse:sha-abc1234 linux/arm64 arm64 aarch64 6893 --pull
 #
 # 为什么必须真跑起来：本项目依赖 sharp(libvips) 这个原生模块。镜像构建成功、清单里写了 arm64，
 # 都不能证明 arm64 上的原生二进制真的能加载 —— 只有进程起来并完成一次真实编码才算数。

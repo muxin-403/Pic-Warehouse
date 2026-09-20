@@ -1,6 +1,6 @@
 # 存储
 
-PicHost 支持 **本地磁盘**、**S3 兼容对象存储**（Cloudflare R2、腾讯云 COS、阿里云 OSS、AWS S3 等）与 **WebDAV**。管理员在 **存储**（`/storage`）页管理后端；新上传写入 **默认后端**。页面顶部展示 **存储总览**（总量、已用、剩余、使用率与容量分布），下方为各后端卡片与支持的后端类型说明。
+Pic-Warehouse 支持 **本地磁盘**、**S3 兼容对象存储**（Cloudflare R2、腾讯云 COS、阿里云 OSS、AWS S3 等）与 **WebDAV**。管理员在 **存储**（`/storage`）页管理后端；新上传写入 **默认后端**。页面顶部展示 **存储总览**（总量、已用、剩余、使用率与容量分布），下方为各后端卡片与支持的后端类型说明。
 
 ![存储管理](/screenshots/storage.png)
 
@@ -36,9 +36,9 @@ PicHost 支持 **本地磁盘**、**S3 兼容对象存储**（Cloudflare R2、�
 | 项 | 说明 |
 | -- | ---- |
 | **服务器地址** | WebDAV 服务地址，可自带路径前缀，如 `https://dav.example.com/remote.php/dav/files/user` |
-| **存储路径** | 图片写入的子目录（如 `pichost`）；留空则直接写入服务器地址根目录。目录不存在时 PicHost 会通过 `MKCOL` 自动逐级创建 |
+| **存储路径** | 图片写入的子目录（如 `pichost`）；留空则直接写入服务器地址根目录。目录不存在时 Pic-Warehouse 会通过 `MKCOL` 自动逐级创建 |
 | **用户名 / 密码** | Basic 认证凭据；留空表示匿名访问。编辑时密码留空即保持原密码 |
-| 访问方式 | WebDAV 通常没有独立 CDN，建议保持 **代理**（`proxy`），由 PicHost 同源出图 |
+| 访问方式 | WebDAV 通常没有独立 CDN，建议保持 **代理**（`proxy`），由 Pic-Warehouse 同源出图 |
 
 图片对象路径为 `{服务器地址}/{存储路径}/{图片 key}`，例如 `https://dav.example.com/remote.php/dav/files/user/pichost/images/2026/09/xxx.webp`。
 
@@ -71,7 +71,7 @@ PicHost 支持 **本地磁盘**、**S3 兼容对象存储**（Cloudflare R2、�
 
 | 模式 | 说明 |
 | ---- | ---- |
-| **proxy** | 通过 PicHost 同源代理出图（`GET /images/...`） |
+| **proxy** | 通过 Pic-Warehouse 同源代理出图（`GET /images/...`） |
 | **public** | 302 重定向到桶/CDN 公网地址 |
 
 复制链接时使用 **图片域名**（`IMAGE_BASE_URL`）拼接路径。开启「隐藏 images 前缀」后 URL 可能更短，服务按文件名或路径反查索引。
@@ -106,15 +106,15 @@ PicHost 支持 **本地磁盘**、**S3 兼容对象存储**（Cloudflare R2、�
 
 ```bash
 # 导出整站备份
-docker exec pichost backup-export
+docker exec pic-warehouse backup-export
 
 # 从备份恢复（默认跳过冲突图片）
-docker exec pichost backup-restore /data/backups/pichost-xxx.phost.tar.gz
-docker exec pichost backup-restore /data/backups/pichost-xxx.phost.tar.gz --overwrite
+docker exec pic-warehouse backup-restore /data/backups/pichost-xxx.phost.tar.gz
+docker exec pic-warehouse backup-restore /data/backups/pichost-xxx.phost.tar.gz --overwrite
 
 # 跨后端同步
-docker exec pichost storage-sync --from local --to s3-xxx --dry-run
-docker exec pichost storage-sync --from local --to s3-xxx --set-default
+docker exec pic-warehouse storage-sync --from local --to s3-xxx --dry-run
+docker exec pic-warehouse storage-sync --from local --to s3-xxx --set-default
 ```
 
 本地开发（项目根目录）：

@@ -1,6 +1,6 @@
 # 反向代理
 
-生产环境建议通过 Nginx、Caddy、NPM（Nginx Proxy Manager）或 NAS 自带反代，将 HTTPS 流量转发到 PicHost 容器 **6892** 端口。
+生产环境建议通过 Nginx、Caddy、NPM（Nginx Proxy Manager）或 NAS 自带反代，将 HTTPS 流量转发到 Pic-Warehouse 容器 **6892** 端口。
 
 ## 基本要求
 
@@ -31,11 +31,11 @@ server {
 IMAGE_BASE_URL=https://pic.example.com
 ```
 
-未设置 `IMAGE_BASE_URL` 时，PicHost 会根据反代转发的 `Host` 与 `X-Forwarded-Proto` 推断公网地址。
+未设置 `IMAGE_BASE_URL` 时，Pic-Warehouse 会根据反代转发的 `Host` 与 `X-Forwarded-Proto` 推断公网地址。
 
 ## 双域名
 
-若后台与图片使用不同域名，两个 `server` 块均可 **全量反代** 到同一端口；隔离由 PicHost 中间件完成。
+若后台与图片使用不同域名，两个 `server` 块均可 **全量反代** 到同一端口；隔离由 Pic-Warehouse 中间件完成。
 
 详见专章：[双域名分离](./domain-separation.md)。
 
@@ -46,24 +46,24 @@ IMAGE_BASE_URL=https://pic.example.com
 | 做法 | 说明 |
 | ---- | ---- |
 | **DNS 橙云** | `admin` / `img` 两个子域 Proxied → 源站反代 `6892`，SSL **Full (strict)** |
-| **DNS 优选** | 与 PicHost 兼容；须保持 **admin → admin、img → img** 回源 |
+| **DNS 优选** | 与 Pic-Warehouse 兼容；须保持 **admin → admin、img → img** 回源 |
 | **R2** | 在存储页作对象后端，非 Pages 托管应用 |
 | **源站防火墙** | 仅放行 [Cloudflare IP](https://www.cloudflare.com/ips/)，禁止公网直连 `6892` |
 
 **不建议：**
 
-- 用 **Cloudflare Pages**（`*.pages.dev`）或 **Workers**（`*.workers.dev`）对 PicHost **整站反代**，或让图片域 **fetch 到管理域** — 会改写 Host、绕过双域名隔离（见 [Cloudflare 部署说明](./cloudflare-deployment.md)）
+- 用 **Cloudflare Pages**（`*.pages.dev`）或 **Workers**（`*.workers.dev`）对 Pic-Warehouse **整站反代**，或让图片域 **fetch 到管理域** — 会改写 Host、绕过双域名隔离（见 [Cloudflare 部署说明](./cloudflare-deployment.md)）
 - 在 CF 控制台「从 Git 创建 Worker」部署本仓库 — 当前为 `node-server` 预设，无法直接 `wrangler deploy`
 
 ## 源站安全（双域名推荐）
 
-除 PicHost 中间件外，建议在反代 / 防火墙层加固：
+除 Pic-Warehouse 中间件外，建议在反代 / 防火墙层加固：
 
 1. **`server_name` 白名单** — 仅网站域与图片域；`default_server` 拒绝裸 IP 与其它 Host
 2. **禁止公网暴露 6892** — 仅本机或内网反代访问；公网只开 80/443
 3. **橙云时限制源站来源 IP** — 仅 Cloudflare 回源 IP 段
 
-**v1.2.2 起**，双域名开启时 PicHost 应用层也会对**未配置的网站域、图片域之外**的 Host 全站返回 404（与反代 default server 互补，而非替代）。误配置导致锁死时执行 `docker exec pichost clear-domains` 恢复，见 [常见问题](./faq.md#双域名配置后后台-404-进不去)。
+**v1.2.2 起**，双域名开启时 Pic-Warehouse 应用层也会对**未配置的网站域、图片域之外**的 Host 全站返回 404（与反代 default server 互补，而非替代）。误配置导致锁死时执行 `docker exec pic-warehouse clear-domains` 恢复，见 [常见问题](./faq.md#双域名配置后后台-404-进不去)。
 
 ## Caddy 示例
 

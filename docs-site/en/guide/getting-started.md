@@ -1,6 +1,6 @@
 # Quick start
 
-PicHost is a self-hosted image host for NAS, home servers, or VPS. Docker is recommended; the first visit runs a web wizard to create the admin account.
+Pic-Warehouse is a self-hosted image host for NAS, home servers, or VPS. Docker is recommended; the first visit runs a web wizard to create the admin account.
 
 ## Try it online
 
@@ -13,11 +13,11 @@ PicHost is a self-hosted image host for NAS, home servers, or VPS. Docker is rec
 
 ```bash
 docker run -d \
-  --name pichost \
+  --name pic-warehouse \
   -p 6892:6892 \
   -v ./data:/data \
   --restart unless-stopped \
-  muxui/pichost:latest
+  ghcr.io/muxin-403/pic-warehouse:latest
 ```
 
 Default port: **6892**. Open `http://<host>:6892` and complete setup.
@@ -62,7 +62,7 @@ If registration is enabled, create an account from the register page (same verif
 If Turnstile / Cap is misconfigured and you cannot sign in, reset to the local slider on the server:
 
 ```bash
-docker exec pichost slider
+docker exec pic-warehouse slider
 ```
 
 Local dev: `npm run slider`
@@ -72,8 +72,8 @@ Local dev: `npm run slider`
 Requires `docker exec` (server access):
 
 ```bash
-docker exec pichost reset-password              # admin only when there is exactly one
-docker exec pichost reset-password <username> # admin or regular user
+docker exec pic-warehouse reset-password              # admin only when there is exactly one
+docker exec pic-warehouse reset-password <username> # admin or regular user
 ```
 
 A random password is printed. Change it after login.
@@ -85,7 +85,7 @@ Local dev: `npm run reset-password` or `npm run reset-password -- <username>`
 If dual-domain is enabled and IP / LAN access returns 404:
 
 ```bash
-docker exec pichost clear-domains
+docker exec pic-warehouse clear-domains
 ```
 
 Local: `npm run clear-domains`. See [FAQ — Admin 404 after dual-domain setup](./faq.md#admin-404--locked-out-after-dual-domain-setup).

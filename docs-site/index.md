@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: PicHost
+  name: Pic-Warehouse
   text: 个人轻量图床
   tagline: 自托管 · 多用户 · Docker · API · Twikoo · 本地磁盘或对象存储
   actions:
@@ -14,7 +14,7 @@ hero:
       link: /guide/api
     - theme: alt
       text: GitHub
-      link: https://github.com/O96u/PicHost
+      link: https://github.com/muxin-403/Pic-Warehouse
 
 features:
   - title: 拖拽 / 粘贴上传
@@ -24,7 +24,7 @@ features:
   - title: 多用户与权限
     details: 管理员与普通用户 RBAC；全局 Token 与个人 Token；图库按归属隔离。
   - title: Docker 零配置
-    details: 首次访问 Web 引导创建管理员；`docker exec pichost reset-password` 重置密码。
+    details: 首次访问 Web 引导创建管理员；`docker exec pic-warehouse reset-password` 重置密码。
   - title: 双域名分离
     details: 单实例 + 两个域名全量反代；应用内中间件隔离后台与图片域。
   - title: Twikoo 兼容

@@ -1,6 +1,6 @@
 # Reverse proxy
 
-In production, terminate HTTPS with Nginx, Caddy, NPM (Nginx Proxy Manager), or your NAS proxy and forward to PicHost on port **6892**.
+In production, terminate HTTPS with Nginx, Caddy, NPM (Nginx Proxy Manager), or your NAS proxy and forward to Pic-Warehouse on port **6892**.
 
 ## Basics
 
@@ -31,11 +31,11 @@ Optional:
 IMAGE_BASE_URL=https://pic.example.com
 ```
 
-Without `IMAGE_BASE_URL`, PicHost infers the public URL from forwarded headers.
+Without `IMAGE_BASE_URL`, Pic-Warehouse infers the public URL from forwarded headers.
 
 ## Dual domains
 
-Both hostnames can fully proxy to the same port; isolation is enforced in PicHost middleware.
+Both hostnames can fully proxy to the same port; isolation is enforced in Pic-Warehouse middleware.
 
 See [Dual-domain separation](./domain-separation.md).
 
@@ -57,13 +57,13 @@ See [Cloudflare deployment](./cloudflare-deployment.md).
 
 ## Origin hardening (dual-domain)
 
-Complement PicHost middleware with:
+Complement Pic-Warehouse middleware with:
 
 1. **`server_name` allowlist** — site + image hosts only; `default_server` blocks bare IP and unknown Host
 2. **Do not expose 6892 on the public Internet** — only local reverse proxy; public 80/443 only
 3. **Orange cloud** — origin firewall limited to Cloudflare IP ranges
 
-**From v1.2.2**, when dual-domain is active PicHost also returns **404 at the app layer** for Host values other than the configured site and image names (complementing, not replacing, a default server block). If misconfiguration locks you out, run `docker exec pichost clear-domains` — see [FAQ](./faq.md#admin-404--locked-out-after-dual-domain-setup).
+**From v1.2.2**, when dual-domain is active Pic-Warehouse also returns **404 at the app layer** for Host values other than the configured site and image names (complementing, not replacing, a default server block). If misconfiguration locks you out, run `docker exec pic-warehouse clear-domains` — see [FAQ](./faq.md#admin-404--locked-out-after-dual-domain-setup).
 
 ## Caddy
 

@@ -1,6 +1,6 @@
 # Changelog
 
-Version history and notable changes. The full log is also in the repo root [CHANGELOG.md](https://github.com/O96u/PicHost/blob/main/CHANGELOG.md).
+Version history and notable changes. The full log is also in the repo root [CHANGELOG.md](https://github.com/muxin-403/Pic-Warehouse/blob/main/CHANGELOG.md).
 
 ---
 
@@ -41,7 +41,7 @@ Version history and notable changes. The full log is also in the repo root [CHAN
 
 ### Added
 
-- **Ops CLI**: `clear-domains` clears site/image URL settings from DB (`docker exec pichost clear-domains`)
+- **Ops CLI**: `clear-domains` clears site/image URL settings from DB (`docker exec pic-warehouse clear-domains`)
 
 ### Docs
 
@@ -52,7 +52,7 @@ Version history and notable changes. The full log is also in the repo root [CHAN
 ### Added
 
 - **Login verification**: slider, Cloudflare Turnstile, or Cap on login/register; configure under Settings → Access
-- **Ops CLI**: `slider` resets verification to the local slider (`docker exec pichost slider`)
+- **Ops CLI**: `slider` resets verification to the local slider (`docker exec pic-warehouse slider`)
 
 ### Improved
 
@@ -205,4 +205,4 @@ Version history and notable changes. The full log is also in the repo root [CHAN
 | 1.1.3 | Dual-domain (`SITE_BASE_URL` / `IMAGE_BASE_URL`); Host middleware |
 | 1.1.0 | Multi storage backends (S3 / R2) |
 
-Older entries: [GitHub CHANGELOG](https://github.com/O96u/PicHost/blob/main/CHANGELOG.md).
+Older entries: [GitHub CHANGELOG](https://github.com/muxin-403/Pic-Warehouse/blob/main/CHANGELOG.md).

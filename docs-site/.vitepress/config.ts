@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 
-const docsBase = 'https://o96u.github.io/PicHost'
+const docsBase = 'https://muxin-403.github.io/Pic-Warehouse'
 
 const zhSidebar = [
   {
@@ -77,10 +77,10 @@ const enSidebar = [
 
 export default withMermaid(
   defineConfig({
-  base: '/PicHost/',
-  title: 'PicHost',
+  base: '/Pic-Warehouse/',
+  title: 'Pic-Warehouse',
   description: '自托管图床文档 · Self-hosted image hosting docs',
-  head: [['link', { rel: 'icon', href: '/PicHost/favicon.ico' }]],
+  head: [['link', { rel: 'icon', href: '/Pic-Warehouse/favicon.ico' }]],
   vite: {
     optimizeDeps: {
       // mermaid → fastdom 为 CJS；dev 模式须预构建，否则整站白屏
@@ -95,7 +95,7 @@ export default withMermaid(
         nav: [
           { text: '指南', link: '/guide/getting-started' },
           { text: 'API', link: '/guide/api' },
-          { text: 'GitHub', link: 'https://github.com/O96u/PicHost' }
+          { text: 'GitHub', link: 'https://github.com/muxin-403/Pic-Warehouse' }
         ],
         sidebar: zhSidebar,
         docFooter: { prev: '上一页', next: '下一页' },
@@ -115,7 +115,7 @@ export default withMermaid(
         nav: [
           { text: 'Guide', link: '/en/guide/getting-started' },
           { text: 'API', link: '/en/guide/api' },
-          { text: 'GitHub', link: 'https://github.com/O96u/PicHost' }
+          { text: 'GitHub', link: 'https://github.com/muxin-403/Pic-Warehouse' }
         ],
         sidebar: enSidebar,
         docFooter: { prev: 'Previous', next: 'Next' },
@@ -129,7 +129,7 @@ export default withMermaid(
     }
   },
   themeConfig: {
-    socialLinks: [{ icon: 'github', link: 'https://github.com/O96u/PicHost' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/muxin-403/Pic-Warehouse' }],
     search: { provider: 'local' },
     editLink: {
       pattern: `${docsBase}/edit/main/docs-site/:path`,

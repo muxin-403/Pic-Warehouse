@@ -1,6 +1,6 @@
 # 更新日志
 
-PicHost 版本历史与重要变更说明。完整记录亦见仓库根目录 [CHANGELOG.md](https://github.com/O96u/PicHost/blob/main/CHANGELOG.md)。
+Pic-Warehouse 版本历史与重要变更说明。完整记录亦见仓库根目录 [CHANGELOG.md](https://github.com/muxin-403/Pic-Warehouse/blob/main/CHANGELOG.md)。
 
 ---
 
@@ -41,7 +41,7 @@ PicHost 版本历史与重要变更说明。完整记录亦见仓库根目录 [C
 
 ### 新增
 
-- **运维 CLI**：`clear-domains` 清除数据库域名配置（`docker exec pichost clear-domains`）
+- **运维 CLI**：`clear-domains` 清除数据库域名配置（`docker exec pic-warehouse clear-domains`）
 
 ### 文档
 
@@ -52,7 +52,7 @@ PicHost 版本历史与重要变更说明。完整记录亦见仓库根目录 [C
 ### 新增
 
 - **登录验证**：登录/注册支持本地滑块、Cloudflare Turnstile、Cap；在「设置 → 访问控制」配置
-- **运维 CLI**：`slider` 将验证方式重置为本地滑块（`docker exec pichost slider`）
+- **运维 CLI**：`slider` 将验证方式重置为本地滑块（`docker exec pic-warehouse slider`）
 
 ### 改进
 
@@ -205,4 +205,4 @@ PicHost 版本历史与重要变更说明。完整记录亦见仓库根目录 [C
 | 1.1.3 | 双域名分离（`SITE_BASE_URL` / `IMAGE_BASE_URL`）；Host 中间件 |
 | 1.1.0 | 多存储后端（S3 / R2 等） |
 
-更早版本见 [GitHub CHANGELOG](https://github.com/O96u/PicHost/blob/main/CHANGELOG.md)。
+更早版本见 [GitHub CHANGELOG](https://github.com/muxin-403/Pic-Warehouse/blob/main/CHANGELOG.md)。

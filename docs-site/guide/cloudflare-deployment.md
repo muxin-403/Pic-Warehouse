@@ -1,6 +1,6 @@
 # Cloudflare / CF 优选部署说明
 
-PicHost 双域名模式下，应用根据请求 **Host**（及可信反代转发的 `X-Forwarded-Host`）区分**管理域**与**图片域**。使用 Cloudflare 橙云、优选线路、Workers 或 Pages 时，只要最终到达 PicHost 的 Host 身份不变，即可正常工作。
+Pic-Warehouse 双域名模式下，应用根据请求 **Host**（及可信反代转发的 `X-Forwarded-Host`）区分**管理域**与**图片域**。使用 Cloudflare 橙云、优选线路、Workers 或 Pages 时，只要最终到达 Pic-Warehouse 的 Host 身份不变，即可正常工作。
 
 > **一句话原则：** 网络线路可以改变，请求的域名身份不能改变 — `admin → admin`，`img → img`，不要 `img → admin`。
 
@@ -18,14 +18,14 @@ PicHost 双域名模式下，应用根据请求 **Host**（及可信反代转发
 | 2 | 中间是否经过 Pages / Worker | 图片域**不得** `fetch(admin…)` |
 | 3 | 反代 upstream | 两个域名均指向 `http://127.0.0.1:6892` |
 | 4 | Nginx `proxy_set_header Host` | `$host`（保持客户端域名） |
-| 5 | PicHost 设置 | `SITE_BASE_URL` / `IMAGE_BASE_URL` 与 `server_name` 一致 |
+| 5 | Pic-Warehouse 设置 | `SITE_BASE_URL` / `IMAGE_BASE_URL` 与 `server_name` 一致 |
 | 6 | 端口 `6892` | 仅本机或内网反代可达，不对公网裸露 |
 
 ---
 
 ## 推荐拓扑
 
-两个域名经 Cloudflare（橙云）后，**各自独立**反代到同一 PicHost 实例：
+两个域名经 Cloudflare（橙云）后，**各自独立**反代到同一 Pic-Warehouse 实例：
 
 ```mermaid
 flowchart TB
@@ -34,7 +34,7 @@ flowchart TB
   admin[admin.example.com]
   img[img.example.com]
   panel[1Panel / Nginx]
-  app[PicHost :6892]
+  app[Pic-Warehouse :6892]
 
   internet --> cf
   cf --> admin
@@ -54,7 +54,7 @@ admin.example.com → http://127.0.0.1:6892
 img.example.com   → http://127.0.0.1:6892
 ```
 
-不需要为「前端 / 后端 / 图片」开不同端口；一个 PicHost 实例、一个内部端口（默认 `6892`）即可。
+不需要为「前端 / 后端 / 图片」开不同端口；一个 Pic-Warehouse 实例、一个内部端口（默认 `6892`）即可。
 
 ### 管理域 ≠ 前端域名
 
@@ -63,7 +63,7 @@ img.example.com   → http://127.0.0.1:6892
 | `admin.example.com` | 后台、登录、设置、图库、API、上传 |
 | `img.example.com` | 图片直链、外链、CDN 分发 |
 
-更准确的说法是**管理域 / 图片域**，而非「前端 / 后端」。PicHost 生产环境也**不需要** `前端 :3000 + 后端 :6892` 这种拆分。
+更准确的说法是**管理域 / 图片域**，而非「前端 / 后端」。Pic-Warehouse 生产环境也**不需要** `前端 :3000 + 后端 :6892` 这种拆分。
 
 ---
 
@@ -76,13 +76,13 @@ admin.example.com、img.example.com
   A / CNAME → 源站 → Proxied
 ```
 
-用户访问 `admin.example.com` 时，PicHost 应收到 `Host: admin.example.com`；访问 `img.example.com` 时应收到 `Host: img.example.com`。
+用户访问 `admin.example.com` 时，Pic-Warehouse 应收到 `Host: admin.example.com`；访问 `img.example.com` 时应收到 `Host: img.example.com`。
 
 **CF 优选**（优选 IP、优选域名、边缘入口）同样可用。优选可以改变用户到 Cloudflare 边缘的路径，但**不能**把图片域的回源身份变成管理域。两个域名应保持平行、独立的回源链：
 
 ```text
-admin → CF → admin.example.com → 源站 → PicHost
-img   → CF → img.example.com   → 源站 → PicHost
+admin → CF → admin.example.com → 源站 → Pic-Warehouse
+img   → CF → img.example.com   → 源站 → Pic-Warehouse
 ```
 
 ---
@@ -98,12 +98,12 @@ flowchart LR
   user[用户 img.example.com]
   worker[Pages / Worker]
   admin[fetch admin.example.com]
-  app[PicHost]
+  app[Pic-Warehouse]
 
   user --> worker --> admin --> app
 ```
 
-最后一跳 Host 变成 `admin.example.com`，PicHost 会认为这是管理域 — `https://img.example.com/` 可能看到后台。这是 **Host 被改写**，不是缓存问题。
+最后一跳 Host 变成 `admin.example.com`，Pic-Warehouse 会认为这是管理域 — `https://img.example.com/` 可能看到后台。这是 **Host 被改写**，不是缓存问题。
 
 ### ❌ 错误 2：优选回源到管理域
 
@@ -116,7 +116,7 @@ img.example.com → 优选域名 → admin.example.com → 源站
 ### ❌ 错误 3：公网直接暴露 6892
 
 ```text
-任意域名 / IP:6892 → PicHost
+任意域名 / IP:6892 → Pic-Warehouse
 ```
 
 用户可绕开 Cloudflare 与 Nginx 的 `server_name` 限制。`6892` 应仅允许 `127.0.0.1` 或内网反代访问。
@@ -124,17 +124,17 @@ img.example.com → 优选域名 → admin.example.com → 源站
 ### ✅ 正确做法
 
 ```text
-admin → admin → PicHost
-img   → img   → PicHost
+admin → admin → Pic-Warehouse
+img   → img   → Pic-Warehouse
 ```
 
-**不要** Pages / Workers **整站反代** PicHost（会多出 `pages.dev` / `workers.dev` 等第三入口）。PicHost 依赖 `node-server`、SQLite、`sharp` 与本地 `data/`，**不能**作为 Node 应用直接部署到 Pages/Workers；应用本体继续 Docker/VPS 部署，CF 侧用橙云 DNS + 可选 R2 即可。
+**不要** Pages / Workers **整站反代** Pic-Warehouse（会多出 `pages.dev` / `workers.dev` 等第三入口）。Pic-Warehouse 依赖 `node-server`、SQLite、`sharp` 与本地 `data/`，**不能**作为 Node 应用直接部署到 Pages/Workers；应用本体继续 Docker/VPS 部署，CF 侧用橙云 DNS + 可选 R2 即可。
 
 ---
 
 ## Workers / Pages 使用建议
 
-若只需改响应头、鉴权、防盗链、日志或缓存，且源站仍是自己的 PicHost：
+若只需改响应头、鉴权、防盗链、日志或缓存，且源站仍是自己的 Pic-Warehouse：
 
 | 推荐 | 不推荐 |
 | ---- | ------ |
@@ -200,15 +200,15 @@ server {
 | 层级 | 作用 |
 | ---- | ---- |
 | **Nginx default server** | 拒绝裸 IP、`pages.dev` 等未在 `server_name` 中声明的 Host |
-| **PicHost 中间件（v1.2.x+）** | 双域名开启时，非 site/image 的 Host 应用层返回 404（开发环境 `localhost` / `127.0.0.1` 例外） |
+| **Pic-Warehouse 中间件（v1.2.x+）** | 双域名开启时，非 site/image 的 Host 应用层返回 404（开发环境 `localhost` / `127.0.0.1` 例外） |
 
-即使应用层已拦截第三 Host，仍建议在反代配置 default server — 减少无效流量到达 PicHost。
+即使应用层已拦截第三 Host，仍建议在反代配置 default server — 减少无效流量到达 Pic-Warehouse。
 
 ---
 
 ## X-Forwarded-Host 说明
 
-PicHost 在反代场景会参考 `X-Forwarded-Host` 识别请求域名，但**不能无条件信任**该 Header（客户端可伪造）。因此：
+Pic-Warehouse 在反代场景会参考 `X-Forwarded-Host` 识别请求域名，但**不能无条件信任**该 Header（客户端可伪造）。因此：
 
 - 不要让 `6892` 对公网裸露
 - 确保只有可信反代能到达应用
@@ -227,7 +227,7 @@ PicHost 在反代场景会参考 `X-Forwarded-Host` 识别请求域名，但**�
 ② 是否经过 Pages / Worker / 优选反代？
 ③ 代理最终 fetch 的 URL？
 ④ 是否 fetch 到 admin.example.com？
-⑤ 1Panel / PicHost 最终收到的 Host？
+⑤ 1Panel / Pic-Warehouse 最终收到的 Host？
 ```
 
 ---

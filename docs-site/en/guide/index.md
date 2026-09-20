@@ -1,6 +1,6 @@
-# PicHost documentation
+# Pic-Warehouse documentation
 
-Welcome to the PicHost user guide. This site is the single source of truth; the repository README keeps a short overview and quick start.
+Welcome to the Pic-Warehouse user guide. This site is the single source of truth; the repository README keeps a short overview and quick start.
 
 ## Suggested reading order
 
@@ -46,7 +46,7 @@ Welcome to the PicHost user guide. This site is the single source of truth; the 
 
 | Branch | Notes |
 | ------ | ----- |
-| [**main**](https://github.com/O96u/PicHost/tree/main) | Full product; screenshots above |
+| [**main**](https://github.com/muxin-403/Pic-Warehouse/tree/main) | Full product; screenshots above |
 | [**cloudflare**](https://github.com/O96u/PicHost/tree/cloudflare) | R2-only; live demo [pic.roven.cc](https://pic.roven.cc) |
 
 Use **main** for multiple cloud backends; use **cloudflare** if you only deploy with Cloudflare R2.

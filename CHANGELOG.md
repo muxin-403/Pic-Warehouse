@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+### 文档
+
+- **项目更名**：PicHost → **Pic-Warehouse**（README、文档站、LICENSE、部署示例与全部命令示例同步更新）
+- **镜像地址迁移**：Docker Hub `muxui/pichost` → GHCR `ghcr.io/muxin-403/pic-warehouse`（linux/amd64 与 linux/arm64 双架构，推送 main 或 `v*` 标签后由 GitHub Actions 自动构建，标签规则见 `.github/workflows/ghcr-publish.yml`）
+- 文档站地址切换为 <https://muxin-403.github.io/Pic-Warehouse/>（在新仓库启用 GitHub Pages 后生效）
+- 运行时数据文件名不变：数据库仍为 `data/pichost.db`，备份包仍为 `pichost-*.phost.tar.gz`，已有部署升级无需迁移数据
+
 ## [1.4.1] - 2026-09-16
 
 ### 新增
@@ -43,7 +50,7 @@
 - **站点恢复**：存储页或 setup 未初始化时从备份包恢复，支持预检与跳过/覆盖冲突
 - **跨后端同步**：在已配置存储后端之间拷贝图片并更新索引；后端卡片快捷「迁入 / 迁出」
 - **任务中心**：`backup_jobs` 记录最近导出/恢复/同步任务，失败可重试；列表分页
-- 运维 CLI：`backup-export`、`backup-restore`、`storage-sync`（`docker exec pichost …`）
+- 运维 CLI：`backup-export`、`backup-restore`、`storage-sync`（`docker exec pic-warehouse …`）
 
 ### 移除
 
@@ -61,7 +68,7 @@
 
 ### 新增
 
-- 运维 CLI `clear-domains`：清除数据库中的网站域 / 图片域配置（`docker exec pichost clear-domains`）
+- 运维 CLI `clear-domains`：清除数据库中的网站域 / 图片域配置（`docker exec pic-warehouse clear-domains`）
 
 ### 文档
 
@@ -72,7 +79,7 @@
 ### 新增
 
 - 登录/注册人机验证：本地滑块、Cloudflare Turnstile、Cap；管理员在「设置 → 访问控制」中切换
-- 运维 CLI `slider`：将登录验证重置为本地滑块（`docker exec pichost slider`）
+- 运维 CLI `slider`：将登录验证重置为本地滑块（`docker exec pic-warehouse slider`）
 
 ### 改进
 
@@ -134,14 +141,14 @@
 - `PATCH /api/settings` 增加 `domainSeparation` 字段与保存校验
 - 设置页：检测地址展示、关闭双域名确认、反代 Host 不一致警告；首次设置不再自动填入 origin
 - Host 中间件：双域名开启时对未知 Host 返回 404（开发 `localhost` 例外）
-- 文档站：新增 [更新日志](https://o96u.github.io/PicHost/guide/changelog)；重写 Cloudflare 部署说明；同步 FAQ / 双域名文档
+- 文档站：新增 [更新日志](https://muxin-403.github.io/Pic-Warehouse/guide/changelog)；重写 Cloudflare 部署说明；同步 FAQ / 双域名文档
 
 ## [1.2.1] - 2026-08-29
 
 ### 新增
 
 - 登录滑动拼图验证（缺口对齐）；验证与登录分两步，登录接口校验 `captchaId` / `captchaPosition`
-- VitePress 文档站（`docs-site/`）：中英文指南，部署至 GitHub Pages <https://o96u.github.io/PicHost/>
+- VitePress 文档站（`docs-site/`）：中英文指南，部署至 GitHub Pages <https://muxin-403.github.io/Pic-Warehouse/>
 - `npm run docs:dev` / `docs:build` / `docs:preview`；CI 增加 `docs:build`；`.github/workflows/docs.yml` 发布文档
 
 ### 修复
@@ -165,7 +172,7 @@
 
 ### 新增
 
-- CLI 迁移工具：`docker exec pichost migrate` / `migrate --apply`（`server/cli/migrate-to-single-images.mjs`）
+- CLI 迁移工具：`docker exec pic-warehouse migrate` / `migrate --apply`（`server/cli/migrate-to-single-images.mjs`）
 - 扫描 `data/` 下除 `images` 外所有顶层目录中的图片，输出 `data/mapping.json`
 - 启动时自动同步图片索引（扫描磁盘、归一化遗留 key、清理孤儿记录），并打印同步日志
 
@@ -206,7 +213,7 @@
 - `/setup` 与系统设置支持启用/关闭域名分离，设置页可后续关闭并恢复单域
 - 可选隐藏外链中的 `images/` 前缀（多文件夹时确认提示）
 - 设置页加载时检测 GitHub 最新版本并提示更新
-- 双域名部署文档（Nginx / Lucky / 本地 hosts 测试）：[文档站 · 双域名分离](https://o96u.github.io/PicHost/guide/domain-separation)
+- 双域名部署文档（Nginx / Lucky / 本地 hosts 测试）：[文档站 · 双域名分离](https://muxin-403.github.io/Pic-Warehouse/guide/domain-separation)
 
 ### 改进
 
@@ -255,7 +262,7 @@
 
 - S3 兼容对象存储后端（R2 / AWS S3 / 腾讯云 COS / 阿里云 OSS）
 - `storage_backends` + `images` 索引表，列表/搜索/统计改查 SQLite
-- 混合直链：`proxy`（默认，PicHost 代理）与 `public`（302 到 CDN）
+- 混合直链：`proxy`（默认，Pic-Warehouse 代理）与 `public`（302 到 CDN）
 - 管理员 `/storage` 存储管理页：多后端卡片、用量条、添加/编辑/删除云存储实例
 - 可选环境变量覆盖存储配置（`STORAGE_BACKEND`、`S3_*`）
 
@@ -293,8 +300,8 @@
 
 - 中英文界面（`@nuxtjs/i18n`），语言切换与主题切换独立菜单
 - 移动端导航：汉堡菜单 + 分组用户菜单（语言 / 外观 / 账户）
-- Docker 忘记密码：`docker exec pichost reset-password`（随机密码，见 `server/cli/`）
-- Docker 升级到 v1.2.0 前迁移遗留目录：`docker exec pichost migrate` / `migrate --apply`
+- Docker 忘记密码：`docker exec pic-warehouse reset-password`（随机密码，见 `server/cli/`）
+- Docker 升级到 v1.2.0 前迁移遗留目录：`docker exec pic-warehouse migrate` / `migrate --apply`
 
 ### 改进
 
@@ -333,11 +340,11 @@
 
 - **v1.2.0**（开发中）：统一 `images/` 存储、遗留目录迁移 CLI、启动索引同步
 
-[1.2.0]: https://github.com/O96u/PicHost/releases/tag/v1.2.0
-[1.1.1]: https://github.com/O96u/PicHost/releases/tag/v1.1.1
-[1.1.0]: https://github.com/O96u/PicHost/releases/tag/v1.1.0
-[1.0.4]: https://github.com/O96u/PicHost/releases/tag/v1.0.4
-[1.0.3]: https://github.com/O96u/PicHost/releases/tag/v1.0.3
-[1.0.2]: https://github.com/O96u/PicHost/releases/tag/v1.0.2
-[1.0.1]: https://github.com/O96u/PicHost/releases/tag/v1.0.1
-[1.0.0]: https://github.com/O96u/PicHost/releases/tag/v1.0.0
+[1.2.0]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.2.0
+[1.1.1]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.1.1
+[1.1.0]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.1.0
+[1.0.4]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.0.4
+[1.0.3]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.0.3
+[1.0.2]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.0.2
+[1.0.1]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.0.1
+[1.0.0]: https://github.com/muxin-403/Pic-Warehouse/releases/tag/v1.0.0
