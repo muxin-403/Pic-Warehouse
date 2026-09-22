@@ -1,9 +1,11 @@
-name: Publish to GHCR (multi-arch)
+name: Publish to GHCR
 
-# 构建并推送同时支持 linux/amd64 与 linux/arm64 的多架构镜像到 GitHub Container Registry。
+# 构建并推送 linux/amd64 镜像到 GitHub Container Registry。
+# 曾同时构建 linux/arm64（单 runner + QEMU），但 arm64 在 QEMU 模拟下
+# 反复于 nuxt build 处挂起（2h 超时），现按需移除，仅保留 amd64。
 #
 # 与本仓库既有的 docker-publish.yml（Docker Hub + 原生 arm runner + 清单合并）互不干扰：
-# 那份走 Docker Hub，这份走 GHCR，用的是「单次 buildx 多平台 + QEMU」策略。
+# 那份走 Docker Hub，这份走 GHCR。
 #
 # 标签命名规则（由 docker/metadata-action 生成，详见下方「计算镜像标签」步骤）：
 #   push tag v1.4.1   -> 1.4.1 / 1.4 / sha-<短SHA>
@@ -21,9 +23,9 @@ on:
   workflow_dispatch:
     inputs:
       platforms:
-        description: 目标平台（逗号分隔，例如 linux/amd64,linux/arm64）
+        description: 目标平台（默认 linux/amd64）
         required: false
-        default: linux/amd64,linux/arm64
+        default: linux/amd64
         type: string
 
 concurrency:
@@ -44,7 +46,7 @@ permissions:
 
 jobs:
   build:
-    name: 构建并推送多架构镜像
+    name: 构建并推送镜像
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
@@ -82,12 +84,13 @@ jobs:
             echo "platforms=linux/amd64" >> "$GITHUB_OUTPUT"
             echo "push=false" >> "$GITHUB_OUTPUT"
           else
-            echo "platforms=${INPUT_PLATFORMS:-linux/amd64,linux/arm64}" >> "$GITHUB_OUTPUT"
+            echo "platforms=${INPUT_PLATFORMS:-linux/amd64}" >> "$GITHUB_OUTPUT"
             echo "push=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up QEMU
-        # 为 arm64 注册 binfmt，使 amd64 runner 能构建（并在验证作业里运行）arm64 镜像
+        # 仅当手动 dispatch 指定了非本机平台（如 arm64）时才需要 binfmt；
+        # 默认 amd64 单平台构建会自动跳过本步骤
         if: ${{ contains(steps.target.outputs.platforms, 'arm64') }}
         uses: docker/setup-qemu-action@v4
         with:
@@ -130,7 +133,7 @@ jobs:
             org.opencontainers.image.description=自托管图床：Nuxt 管理端、本地磁盘或 S3 兼容存储、服务端 WebP 压缩
             org.opencontainers.image.licenses=GPL-3.0-only
 
-      - name: 构建并推送（buildx 多平台）
+      - name: 构建并推送（buildx）
         id: build
         uses: docker/build-push-action@v7
         with:
@@ -187,19 +190,9 @@ jobs:
             arch: amd64
             machine: x86_64
             port: 6892
-          - platform: linux/arm64
-            arch: arm64
-            machine: aarch64
-            port: 6893 # 两个架构用不同宿主端口，避免冲突
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-
-      - name: Set up QEMU
-        # 在 amd64 runner 上运行 arm64 容器同样依赖 binfmt
-        uses: docker/setup-qemu-action@v4
-        with:
-          platforms: arm64
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -211,7 +204,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 校验 OCI 清单同时包含 amd64 与 arm64
+      - name: 校验 OCI 清单包含 linux/amd64
         env:
           TARGET_TAG: ${{ needs.build.outputs.sha_tag }}
           IMAGE_REF: ${{ needs.build.outputs.image_ref }}
@@ -223,11 +216,9 @@ jobs:
             | jq -r '.manifests[] | "\(.platform.os)/\(.platform.architecture)"' | sort -u)"
           echo "清单内平台："
           printf '%s\n' "$ARCHES"
-          for want in linux/amd64 linux/arm64; do
-            printf '%s\n' "$ARCHES" | grep -qx "$want" \
-              || { echo "::error::镜像清单缺少 ${want}"; exit 1; }
-          done
-          echo "清单同时包含 linux/amd64 与 linux/arm64"
+          printf '%s\n' "$ARCHES" | grep -qx "linux/amd64" \
+            || { echo "::error::镜像清单缺少 linux/amd64"; exit 1; }
+          echo "清单包含 linux/amd64"
 
       - name: 真实启动容器并验证运行时不变式
         env:
