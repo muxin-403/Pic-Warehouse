@@ -131,6 +131,32 @@ export function ensureDefaultBackends(): void {
     `).run(LOCAL_BACKEND_ID, '本地磁盘')
   }
 
+  // 环境变量引导的后端同步落库：images.backend_id 有外键约束，
+  // 若 storage_backends 无对应行，上传时索引写入会直接失败
+  const envBackend = getStorageBackendFromEnv()
+  if (envBackend) {
+    const envId = envBackend.type === 'webdav' ? WEBDAV_BACKEND_ID : S3_BACKEND_ID
+    const exists = db.prepare(`
+      SELECT id FROM storage_backends WHERE id = ?
+    `).get(envId)
+    if (!exists) {
+      db.prepare(`
+        INSERT INTO storage_backends
+          (id, name, type, config_json, secret_json, serving_mode, public_url,
+           quota_bytes, enabled, is_default, sort_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, 1, 1, 0)
+      `).run(
+        envId,
+        envBackend.type === 'webdav' ? 'WebDAV（环境变量）' : 'S3（环境变量）',
+        envBackend.type,
+        JSON.stringify(envBackend.config),
+        JSON.stringify(envBackend.secrets),
+        envBackend.servingMode,
+        envBackend.publicUrl
+      )
+    }
+  }
+
   cleanupPlaceholderS3Backend(db)
 }
 

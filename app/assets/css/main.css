@@ -20,10 +20,25 @@
   -webkit-backface-visibility: hidden;
 }
 
+/*
+ * 两个面在 preserve-3d 翻转容器内位于同一平面（coplanar），浏览器的命中测试
+ * 对共面元素的结果不确定：被 backface-visibility 隐藏的一面仍可能接收指针事件，
+ * 导致在背面设置面板拖动 WebP 压缩质量滑块时，事件落到正面并触发文件选择对话框。
+ * 因此显式将 pointer-events 与可见性绑定：隐藏面不参与命中测试。
+ */
 .upload-card-face--back {
   position: absolute;
   inset: 0;
   transform: rotateY(180deg);
+  pointer-events: none;
+}
+
+.upload-card-flip.is-flipped .upload-card-face--back {
+  pointer-events: auto;
+}
+
+.upload-card-flip.is-flipped .upload-card-face--front {
+  pointer-events: none;
 }
 
 @media (max-width: 639px) {

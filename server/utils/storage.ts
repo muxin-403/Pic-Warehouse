@@ -129,6 +129,9 @@ export async function headImage(key: string): Promise<StoredImage | null> {
       backendId: backend.id,
       originalName: indexed.originalName,
       contentType,
+      // 索引记录的是上传时的真实大小；部分远端后端（如 HEAD 缺失 Content-Length 的
+      // WebDAV 服务）探测结果可能为 0，此时必须以索引为准，避免直链响应被截断
+      size: indexed.size > 0 ? indexed.size : stored.size,
       uploadedAt: indexed.uploadedAt,
       userId: indexed.userId
     }

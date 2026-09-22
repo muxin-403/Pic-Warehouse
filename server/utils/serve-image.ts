@@ -159,7 +159,8 @@ export async function serveImageByKey(event: H3Event, key: string) {
 
   const method = getMethod(event)
   if (method === 'HEAD') {
-    setHeader(event, 'Content-Length', stored.size)
+    // size 未知（0）时不声明 Content-Length，交由分块传输，避免声明 0 截断
+    if (stored.size > 0) setHeader(event, 'Content-Length', stored.size)
     return null
   }
 
@@ -172,6 +173,6 @@ export async function serveImageByKey(event: H3Event, key: string) {
     return sendStream(event, await createImageStream(key, range))
   }
 
-  setHeader(event, 'Content-Length', stored.size)
+  if (stored.size > 0) setHeader(event, 'Content-Length', stored.size)
   return sendStream(event, await createImageStream(key))
 }

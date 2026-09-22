@@ -252,14 +252,25 @@ export class WebdavStorageBackend implements StorageBackend {
       size = Number(response.headers.get('content-length') ?? 0) || 0
       contentType = response.headers.get('content-type') ?? ''
       lastModified = response.headers.get('last-modified') ?? ''
-    } else if (response.status === 405 || response.status === 501 || response.status === 400) {
+
+      // 部分 WebDAV 服务（Alist、部分 NAS）HEAD 200 时不返回 Content-Length，
+      // 需回退 PROPFIND 获取真实大小，否则上层会误发 Content-Length: 0 截断响应体
+      if (!size) {
+        const props = await this.propsViaPropfind(url)
+        if (props) {
+          size = props.size
+          contentType = contentType || props.contentType
+          lastModified = lastModified || props.lastModified
+        }
+      }
+    } else {
+      // HEAD 不可用/误报 404 时（部分服务器对文件屏蔽 HEAD），
+      // 统一回退 PROPFIND：对象不存在时 PROPFIND 同样返回 404，语义不变
       const props = await this.propsViaPropfind(url)
       if (!props) return null
       size = props.size
       contentType = props.contentType
       lastModified = props.lastModified
-    } else {
-      return null
     }
 
     const modified = lastModified ? Date.parse(lastModified) : Number.NaN
