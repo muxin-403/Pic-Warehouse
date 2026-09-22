@@ -204,21 +204,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 校验 OCI 清单包含 linux/amd64
+      - name: 校验镜像为 linux/amd64
         env:
           TARGET_TAG: ${{ needs.build.outputs.sha_tag }}
           IMAGE_REF: ${{ needs.build.outputs.image_ref }}
         run: |
           set -eu
           REF="${IMAGE_REF}:${TARGET_TAG}"
-          ARCHES="$(docker buildx imagetools inspect "$REF" \
-            --format '{{json .Manifest}}' \
-            | jq -r '.manifests[] | "\(.platform.os)/\(.platform.architecture)"' | sort -u)"
-          echo "清单内平台："
-          printf '%s\n' "$ARCHES"
-          printf '%s\n' "$ARCHES" | grep -qx "linux/amd64" \
-            || { echo "::error::镜像清单缺少 linux/amd64"; exit 1; }
-          echo "清单包含 linux/amd64"
+
+          # 权威校验：指定平台拉取，若该 tag 没有 amd64 变体将直接失败
+          docker pull --platform linux/amd64 "$REF" >/dev/null
+          ACTUAL="$(docker image inspect --format '{{.Os}}/{{.Architecture}}' "$REF")"
+          echo "拉取到的镜像平台：${ACTUAL}"
+          [ "${ACTUAL}" = "linux/amd64" ] \
+            || { echo "::error::镜像平台为 ${ACTUAL}，期望 linux/amd64"; exit 1; }
+
+          # 打印清单信息供排查（单平台为 image manifest，多平台为 index，两种形态都兼容）
+          docker buildx imagetools inspect "$REF"
 
       - name: 真实启动容器并验证运行时不变式
         env:
